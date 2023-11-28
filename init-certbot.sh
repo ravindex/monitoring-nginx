@@ -5,20 +5,7 @@ if ! [ -x "$(command -v docker compose)" ]; then
   exit 1
 fi
 
-read_key() {
-  local env_file="$1"
-  local key="$2"
-  
-  if [ -f "$env_file" ]; then
-    values=($(grep "^$key=" "$env_file" | cut -d '=' -f 2))
-    echo "${values[@]}"
-  else
-    echo "Error: $env_file not found."
-    exit 1
-  fi
-}
-
-domains=$(read_key .env DOMAINS)
+domains=(prometheus.ravindex.ir grafana.ravindex.ir)
 rsa_key_size=4096
 data_path="./certbot"
 email="amirshabanics@gmail.com" # Adding a valid address is strongly recommended
