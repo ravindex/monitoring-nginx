@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if ! [ -x "$(command -v docker-compose)" ]; then
-  echo 'Error: docker-compose is not installed.' >&2
+if ! [ -x "$(command -v docker compose)" ]; then
+  echo 'Error: docker compose is not installed.' >&2
   exit 1
 fi
 
@@ -42,7 +42,7 @@ fi
 echo "### Creating dummy certificate for $domains ..."
 path="/etc/letsencrypt/live/$domains"
 mkdir -p "$data_path/conf/live/$domains"
-docker-compose run --rm --entrypoint "\
+docker compose run --rm --entrypoint "\
   openssl req -x509 -nodes -newkey rsa:$rsa_key_size -days 1\
     -keyout '$path/privkey.pem' \
     -out '$path/fullchain.pem' \
@@ -51,11 +51,11 @@ echo
 
 
 echo "### Starting nginx ..."
-docker-compose up --force-recreate -d nginx
+docker compose up --force-recreate -d nginx
 echo
 
 echo "### Deleting dummy certificate for $domains ..."
-docker-compose run -e HTTP_PROXY="$proxy" -e HTTPS_PROXY="$proxy" --rm --entrypoint "\
+docker compose run -e HTTP_PROXY="$proxy" -e HTTPS_PROXY="$proxy" --rm --entrypoint "\
   rm -Rf /etc/letsencrypt/live/$domains && \
   rm -Rf /etc/letsencrypt/archive/$domains && \
   rm -Rf /etc/letsencrypt/renewal/$domains.conf" certbot
@@ -80,7 +80,7 @@ if [ $staging != "0" ]; then staging_arg="--staging"; fi
 
 echo certbot -v certonly --webroot -w /var/www/certbot $email_arg $domain_args --rsa-key-size $rsa_key_size --agree-tos --force-renewal
 
-docker-compose run -e HTTP_PROXY="$proxy" -e HTTPS_PROXY="$proxy" --rm --entrypoint "\
+docker compose run -e HTTP_PROXY="$proxy" -e HTTPS_PROXY="$proxy" --rm --entrypoint "\
   certbot -v certonly --webroot -w /var/www/certbot \
     $staging_arg \
     $email_arg \
@@ -91,4 +91,4 @@ docker-compose run -e HTTP_PROXY="$proxy" -e HTTPS_PROXY="$proxy" --rm --entrypo
 echo
 
 echo "### Reloading nginx ..."
-docker-compose exec nginx nginx -s reload
+docker compose exec nginx nginx -s reload
