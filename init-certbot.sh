@@ -6,15 +6,16 @@ if ! [ -x "$(command -v docker compose)" ]; then
 fi
 
 read_key() {
-    local file="$1"
-    local key="$2"
-    if [ -f "$file" ]; then
-        local line=$(grep "^$key=" "$file")
-        local value=$(echo "$line" | cut -d '=' -f 2)
-        echo "$value"
-    else
-        echo "Error: File $file not found."
-    fi
+  local env_file="$1"
+  local key="$2"
+  
+  if [ -f "$env_file" ]; then
+    values=($(grep "^$key=" "$env_file" | cut -d '=' -f 2))
+    echo "${values[@]}"
+  else
+    echo "Error: $env_file not found."
+    exit 1
+  fi
 }
 
 domains=$(read_key .env DOMAINS)
